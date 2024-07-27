@@ -1,0 +1,79 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('io.swagger.codegen.v3:swagger-codegen-maven-plugin:3.0.16')
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.6' apply false
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.aspire'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
+import io.swagger.codegen.v3.CodegenConfigLoader
+import io.swagger.codegen.v3.DefaultGenerator
+import io.swagger.codegen.v3.ClientOptInput
+import io.swagger.codegen.v3.ClientOpts
+import io.swagger.v3.parser.OpenAPIV3Parser
+
+ext.swaggerFile  = "${projectDir}/src/main/resources/swagger.json"
+ext.outputDir = "${projectDir}/target"
+tasks.register('generateApi') {
+    doLast {
+        def openAPI = new OpenAPIV3Parser().read(swaggerFile, null, null)
+        println(rootDir)
+        def clientOpts = new ClientOptInput().openAPI(openAPI)
+        def codegenConfig = CodegenConfigLoader.forName('spring')
+        codegenConfig.setOutputDir(outputDir)
+        codegenConfig.setApiPackage("com.aspire.api")
+        codegenConfig.setModelPackage("com.aspire.model")
+        codegenConfig.setLibrary("spring-boot")
+
+        clientOpts.setConfig(codegenConfig)
+        def clientOps = new ClientOpts()
+        clientOps.setProperties([
+                'dateLibrary'  : 'java11', // Date library to use
+                'useTags'      : 'true',  // Use tags for the naming
+                'interfaceOnly': 'true'   // Generating the Controller API interface and the models only
+        ])
+        clientOpts.setOpts(clientOps)
+
+        def generator = new DefaultGenerator().opts(clientOpts)
+        generator.generate() // Executing the generation
+    }
+}
+
+configurations {
+    generatedCompile
+}
+
+sourceSets.main.java.srcDir "${outputDir}/src/main/java"
+
+clean.doFirst {
+    delete(outputDir)
+}
+
+compileJava.dependsOn(generateApi)
+
+dependencies {
+    implementation 'io.swagger:swagger-annotations:1.6.8'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.6'
+    implementation 'org.springframework:spring-web:5.3.23'
+}

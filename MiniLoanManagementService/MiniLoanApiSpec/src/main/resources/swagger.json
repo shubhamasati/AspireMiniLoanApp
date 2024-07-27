@@ -1,0 +1,536 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Mini-Aspire API",
+    "version": "1.0.0",
+    "description": "API for managing loans and repayments"
+  },
+  "tags": [
+
+  ],
+  "paths": {
+    "/api/loan/applications": {
+      "post": {
+        "summary": "Create a new loan application",
+        "tags": [
+          "Loan Application"
+        ],
+        "description": "Creates Loan Application",
+        "operationId": "CreateLoanApplication",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoanApplication"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Loan created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/loans":{
+      "get": {
+        "summary": "Get all loans for the authenticated user",
+        "tags": [
+          "Loan"
+        ],
+        "description": "List of Loans user applied",
+        "operationId": "GetLoanList",
+        "responses": {
+          "200": {
+            "description": "List of loans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Loan"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/loan/applications/{applicationId}/approve": {
+      "put": {
+        "summary": "Approve a loan application",
+        "tags": [
+          "Loan Application"
+        ],
+        "description": "Approve Loan Application",
+        "operationId": "ApproveLoanApplication",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan approved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanApprovalResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Loan not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/loans/{loanId}/repayments/{repaymentId}": {
+      "put": {
+        "summary": "Add a repayment",
+        "tags": [
+          "Loan"
+        ],
+        "description": "Repayment of Loan",
+        "operationId": "LoanRepayment",
+        "parameters": [
+          {
+            "name": "loanId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "repaymentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RepaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Repayment added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repayment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Loan not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "summary": "Log in User",
+        "tags": [
+          "User Auth Api"
+        ],
+        "description": "Get user logged in",
+        "operationId": "userLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Logged-in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Loan not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/users/signup": {
+      "post": {
+        "summary": "Sign-up User",
+        "tags": [
+          "User Auth Api"
+        ],
+        "description": "Get user registered",
+        "operationId": "userSignUp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Logged-in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Loan not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Loan": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "term": {
+            "type": "integer"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "interest_rate": {
+            "type": "string"
+          },
+          "repayments": {
+            "type": "array",
+            "items": {
+              "$ref":  "#/components/schemas/Repayment"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "debugId": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetails"
+            }
+          }
+        }
+      },
+      "ErrorDetails": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "issue": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "LoanApplication": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "term": {
+            "type": "integer"
+          }
+        }
+      },
+      "LoanApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "application_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "term": {
+            "type": "integer"
+          }
+        }
+      },
+      "LoanApprovalResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "application_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "loan_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "term": {
+            "type": "integer"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "repayments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Repayment"
+            }
+          }
+        }
+      },
+      "Repayment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "repayment_amount": {
+            "type": "string"
+          },
+          "principle_amount": {
+            "type": "string"
+          },
+          "interest_charged": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string"
+          },
+          "paid_at": {
+            "type": "string"
+          }
+        }
+      },
+      "RepaymentRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          }
+        }
+      },
+      "RepaymentResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "repayment_id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "emailId": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}
